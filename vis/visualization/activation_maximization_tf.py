@@ -3,14 +3,14 @@ from __future__ import absolute_import
 import numpy as np
 from tensorflow.contrib.keras import backend as K
 
-from ..losses import ActivationMaximization
+from ..losses_tf import ActivationMaximization
 from ..optimizer import Optimizer
 from ..regularizers import TotalVariation, LPNorm
 from ..backprop_modifiers import get
 from ..utils import utils
 
 
-def visualize_activation_with_losses(input_tensor, losses, wrt_tensor=None,
+def visualize_activation_with_losses_tf(input_tensor, losses, wrt_tensor=None,
                                      seed_input=None, input_range=(0, 255),
                                      **optimizer_params):
     """Generates the `input_tensor` that minimizes the weighted `losses`. This function is intended for advanced
@@ -51,7 +51,7 @@ def visualize_activation_with_losses(input_tensor, losses, wrt_tensor=None,
     return img
 
 
-def visualize_activation(model, layer_idx, filter_indices=None, wrt_tensor=None,
+def visualize_activation_tf(inputs,end_points, layer_name, filter_indices=None, wrt_tensor=None,
                          seed_input=None, input_range=(0, 255),
                          backprop_modifier=None, grad_modifier=None,
                          act_max_weight=1, lp_norm_weight=10, tv_weight=10,
@@ -93,14 +93,11 @@ def visualize_activation(model, layer_idx, filter_indices=None, wrt_tensor=None,
     Returns:
         The model input that maximizes the output of `filter_indices` in the given `layer_idx`.
     """
-    if backprop_modifier is not None:
-        modifier_fn = get(backprop_modifier)
-        model = modifier_fn(model)
 
     losses = [
-        (ActivationMaximization(model.layers[layer_idx], filter_indices), act_max_weight),
-        (LPNorm(model.input), lp_norm_weight),
-        (TotalVariation(model.input), tv_weight)
+        (ActivationMaximization(end_points[layer_name], filter_indices), act_max_weight),
+        (LPNorm(inputs), lp_norm_weight),
+        (TotalVariation(inputs), tv_weight)
     ]
 
     # Add grad_filter to optimizer_params.
@@ -108,5 +105,5 @@ def visualize_activation(model, layer_idx, filter_indices=None, wrt_tensor=None,
         'grad_modifier': grad_modifier
     }, **optimizer_params)
 
-    return visualize_activation_with_losses(model.input, losses, wrt_tensor,
+    return visualize_activation_with_losses_tf(inputs, losses, wrt_tensor,
                                             seed_input, input_range, **optimizer_params)

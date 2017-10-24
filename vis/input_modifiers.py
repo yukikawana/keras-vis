@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import numpy as np
 from scipy.ndimage.interpolation import shift
 from .utils import utils
-from keras import backend as K
+from tensorflow.contrib.keras import backend as K
 
 
 class InputModifier(object):

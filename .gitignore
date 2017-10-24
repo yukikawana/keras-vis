@@ -13,5 +13,8 @@ docs/sources/*
 keras_vis.egg-info
 dist/*
 build/*
+*.h5
 *.pyc
 .ipynb_checkpoints
+*.ckpt
+*.tar.gz

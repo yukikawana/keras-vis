@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import numpy as np
-from keras import backend as K
+from tensorflow.contrib.keras import backend as K
 
 from .callbacks import Print
 from .grad_modifiers import get
